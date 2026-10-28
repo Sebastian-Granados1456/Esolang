@@ -1,4 +1,4 @@
-package rolo.lexer;
+package cubun.lexer;
 
 public enum TipoToken {
     PALABRA_CLAVE,
@@ -8,6 +8,5 @@ public enum TipoToken {
     BOOLEANO,
     OPERADOR,
     PUNTUACION,
-    COMENTARIO,
     FIN
 }

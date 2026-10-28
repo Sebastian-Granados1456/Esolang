@@ -1,4 +1,4 @@
-package rolo.lexer;
+package cubun.lexer;
 
 public class ErrorLexico extends RuntimeException {
 

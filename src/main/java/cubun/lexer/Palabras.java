@@ -1,10 +1,10 @@
-package rolo.lexer;
+package cubun.lexer;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-// Vocabulario de Rolo: para agregar una frase basta con añadirla a su lista (tildes y mayúsculas da igual).
+// Vocabulario de Cubun: para agregar una frase basta con añadirla a su lista (tildes y mayúsculas da igual).
 public final class Palabras {
 
     private Palabras() {
@@ -21,7 +21,7 @@ public final class Palabras {
         PALABRAS_CLAVE.put("VALE", List.of("vale"));
         PALABRAS_CLAVE.put("IMPRIMIR", List.of("suelte el chisme", "cuente", "diga"));
         PALABRAS_CLAVE.put("LEER", List.of("cuénteme", "pregunte"));
-        PALABRAS_CLAVE.put("SI", List.of("si", "si es que"));
+        PALABRAS_CLAVE.put("SI", List.of("si", "si es que", "por si las moscas"));
         PALABRAS_CLAVE.put("SINO", List.of("si no", "o si no", "de lo contrario"));
         PALABRAS_CLAVE.put("ENTONCES", List.of("entonces", "hágale"));
         PALABRAS_CLAVE.put("MIENTRAS", List.of("mientras", "dele mientras", "dele que dele mientras"));
@@ -36,7 +36,7 @@ public final class Palabras {
         OPERADORES_VERBALES.put("*", List.of("por"));
         OPERADORES_VERBALES.put("/", List.of("entre"));
         OPERADORES_VERBALES.put("%", List.of("módulo"));
-        OPERADORES_VERBALES.put("==", List.of("igual a", "igualito a"));
+        OPERADORES_VERBALES.put("==", List.of("igual a", "igualito a", "tal cuál"));
         OPERADORES_VERBALES.put("!=", List.of("distinto de", "diferente de"));
         OPERADORES_VERBALES.put(">", List.of("mayor que"));
         OPERADORES_VERBALES.put("<", List.of("menor que"));
@@ -47,13 +47,13 @@ public final class Palabras {
         OPERADORES_VERBALES.put("no", List.of("no"));
 
         BOOLEANOS.put(true, List.of("de una", "obvio"));
-        BOOLEANOS.put(false, List.of("ni de fundas", "nones"));
+        BOOLEANOS.put(false, List.of("ni por el putas", "nokas"));
     }
 
     // Vocativos y relleno: el lexer los reconoce y los descarta.
     public static final List<String> MULETILLAS = List.of(
             "parce", "parcero", "sumercé", "veci", "mijo", "mija", "pues",
-            "oiga", "ve", "vea", "bueno", "hermano", "llave", "socio");
+            "oiga", "ve", "vea", "bueno", "hermano", "llave", "socio", "chino", "china");
 
     // Los de dos caracteres van primero para que "==" no se lea como "=" "=".
     public static final List<String> OPERADORES_SIMBOLOS = List.of(
@@ -67,7 +67,4 @@ public final class Palabras {
             ':', "DOS_PUNTOS",
             '(', "PAREN_ABRE",
             ')', "PAREN_CIERRA");
-
-    // Se ignoran, solo adornan.
-    public static final String APERTURAS = "¿¡";
 }

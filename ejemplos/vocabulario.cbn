@@ -1,14 +1,13 @@
 ¿Quiubo, parce?
-# pa' mí: este archivo solo muestra los tokens, la gramática llega en la fase 2
 
 Ponga que plata vale 20000.
 Ponga que nombre vale "Sumercé Pérez".
 Ponga que listo_para_salir vale de una.
 
 Si plata mayor o igual que 15000 hágale:
-    Suelte el chisme «Alcanza pa'l almuerzo».
+    Suelte el chisme "Alcanza pa'l almuerzo".
 O si no:
-    Diga "Toca hacer una vaca\n".
+    Diga "Toca hacer una vaca".
 Listo el pollo.
 
 Dele mientras plata > 0:

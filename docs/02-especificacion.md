@@ -1,14 +1,14 @@
-# Especificación del lenguaje Rolo
+# Especificación del lenguaje Cubun
 
 Este documento crece con cada fase. Por ahora define el **nivel léxico** (fase 1). La gramática se agrega en la fase 2.
 
 ## 1. Generalidades
 
-- **Nombre:** Rolo («rolo» es como se le dice a la gente de Bogotá).
+- **Nombre:** Cubun. Viene de *muysccubun*, la lengua muisca: *muysca* = «gente», *cubun* = «lengua, palabra».
 - **Paradigma:** imperativo, con variables, condicionales, bucles y funciones.
-- **Extensión de archivo:** `.rolo`
+- **Extensión de archivo:** `.cbn`
 - **Codificación:** UTF-8.
-- **Implementación:** Java 21 con Maven; pruebas con JUnit 5.
+- **Implementación:** Java 21 con Maven.
 
 ## 2. Tipos de token
 
@@ -17,14 +17,15 @@ Este documento crece con cada fase. Por ahora define el **nivel léxico** (fase 
 | `PALABRA_CLAVE` | Frase del vocabulario, de una o varias palabras | `Ponga que`, `Suelte el chisme`, `Listo el pollo` |
 | `IDENTIFICADOR` | Nombre de variable o de función | `plata`, `año`, `precio_final` |
 | `NUMERO` | Entero o decimal | `42`, `3.14` |
-| `TEXTO` | Cadena entre `"…"` o `«…»` | `"hola"`, `«qué más»` |
-| `BOOLEANO` | Verdadero o falso | `de una`, `ni de fundas` |
+| `TEXTO` | Cadena entre comillas dobles | `"hola"`, `"qué más"` |
+| `BOOLEANO` | Verdadero o falso | `de una`, `nokas` |
 | `OPERADOR` | Símbolo u operador en palabras | `+`, `más`, `>=`, `mayor o igual que` |
 | `PUNTUACION` | Fin de frase, coma, dos puntos, paréntesis | `.`, `,`, `:`, `(` |
-| `COMENTARIO` | Habla egocéntrica, desde `#` hasta el final de la línea | `# pa' mí: esto es la plata` |
 | `FIN` | Fin del archivo | — |
 
-Cada token guarda su **tipo**, su **valor** (el nombre canónico, el número o el texto ya procesado), su **lexema** (lo que se escribió tal cual), la **línea** y la **columna**.
+Cada token guarda su **tipo**, su **valor** (el nombre canónico, el número o el texto sin comillas), su **lexema** (lo que se escribió tal cual), la **línea** y la **columna**.
+
+Los **comentarios** van desde `#` hasta el final de la línea y el lexer los ignora: `# pa' mí: esto es la plata`.
 
 ## 3. Reglas léxicas
 
@@ -46,11 +47,11 @@ Son dígitos, con una parte decimal opcional (`3.14`). Un punto que no va seguid
 
 ### 3.4 Textos
 
-Van entre `"…"` o `«…»` y no pueden ocupar varias líneas. Los escapes válidos son `\n`, `\t`, `\\`, `\"` y `\»`.
+Van entre comillas dobles `"…"` y no pueden ocupar varias líneas. No hay secuencias de escape, así que un texto no puede contener comillas dobles.
 
 ### 3.5 Muletillas
 
-`parce`, `parcero`, `sumercé`, `veci`, `mijo`, `mija`, `pues`, `oiga`, `ve`, `vea`, `bueno`, `hermano`, `llave`, `socio`.
+`parce`, `parcero`, `sumercé`, `veci`, `mijo`, `mija`, `pues`, `oiga`, `ve`, `vea`, `bueno`, `hermano`, `llave`, `socio`, `chino`, `china`.
 
 El lexer las reconoce y las **descarta**, junto con las comas del vocativo: `¿Quiubo, parce?` produce solo `INICIO` y `FIN_FRASE`.
 
@@ -66,7 +67,7 @@ El lexer las reconoce y las **descarta**, junto con las comas del vocativo: `¿Q
 
 ## 4. Vocabulario
 
-La lista completa vive en `src/main/java/rolo/lexer/Palabras.java`. Para agregar frases nuevas basta con añadirlas a la lista que corresponda.
+La lista completa vive en `src/main/java/cubun/lexer/Palabras.java`. Para agregar frases nuevas basta con añadirlas a la lista que corresponda.
 
 ### 4.1 Palabras clave
 
@@ -93,7 +94,7 @@ La lista completa vive en `src/main/java/rolo/lexer/Palabras.java`. Para agregar
 | Símbolo | En palabras |
 |---|---|
 | `+` `-` `*` `/` `%` | más, menos, por, entre, módulo |
-| `==` `!=` | igual a / igualito a, distinto de / diferente de |
+| `==` `!=` | igual a / igualito a / tal cuál, distinto de / diferente de |
 | `>` `<` `>=` `<=` | mayor que, menor que, mayor o igual que, menor o igual que |
 | `y` `o` `no` | y, o, no |
 | `=` | (solo símbolo) |
@@ -103,7 +104,7 @@ La lista completa vive en `src/main/java/rolo/lexer/Palabras.java`. Para agregar
 | Valor | Frases |
 |---|---|
 | verdadero | de una, obvio |
-| falso | ni de fundas, nones |
+| falso | ni por el putas, nokas |
 
 ## 5. Errores léxicos
 
@@ -114,4 +115,3 @@ Todos empiezan con `¡Qué boleta! Línea L, columna C:`.
 | Carácter que no pertenece al lenguaje | `¿Y eso qué es? No le entiendo el '@'.` |
 | Texto sin cerrar | `Dejó el chisme a medias: le faltó cerrar las comillas.` |
 | Número pegado a letras | `'12lucas' no es ni plata ni nombre.` |
-| Escape desconocido | `No conozco el escape '\q'.` |
