@@ -1,6 +1,5 @@
 package cubun;
 
-// Base de todos los errores del lenguaje: siempre con línea y columna.
 public class ErrorCubun extends RuntimeException {
 
     private final int linea;

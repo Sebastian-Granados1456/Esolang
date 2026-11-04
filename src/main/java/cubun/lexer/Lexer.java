@@ -77,7 +77,6 @@ public class Lexer {
         return pos < codigo.length();
     }
 
-    // '\0' indica que ya no hay más código.
     private char actual(int k) {
         int i = pos + k;
         return i < codigo.length() ? codigo.charAt(i) : '\0';
@@ -162,7 +161,6 @@ public class Lexer {
     private void leerPalabra() {
         int inicio = pos, l = linea, col = columna;
 
-        // Palabras que siguen en la misma línea, con la posición donde termina cada una.
         List<String> palabras = new ArrayList<>();
         List<Integer> finales = new ArrayList<>();
         int p = pos;
@@ -202,7 +200,6 @@ public class Lexer {
         agregar(TipoToken.IDENTIFICADOR, codigo.substring(inicio, pos), inicio, l, col);
     }
 
-    // Solo se usa dentro de una misma línea.
     private void saltarHasta(int fin) {
         columna += fin - pos;
         pos = fin;

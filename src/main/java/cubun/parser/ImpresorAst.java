@@ -15,7 +15,6 @@ import cubun.parser.Sentencia.Leer;
 import cubun.parser.Sentencia.Mientras;
 import cubun.parser.Sentencia.Si;
 
-// Dibuja el AST como un árbol de texto.
 public final class ImpresorAst {
 
     private record Rama(String etiqueta, List<Rama> hijos) {

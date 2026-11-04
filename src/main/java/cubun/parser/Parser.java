@@ -18,7 +18,6 @@ import cubun.parser.Sentencia.Leer;
 import cubun.parser.Sentencia.Mientras;
 import cubun.parser.Sentencia.Si;
 
-// Parser descendente recursivo: un método por cada regla de la gramática (ver docs/02-especificacion.md).
 public class Parser {
 
     private final List<Token> tokens;
@@ -31,8 +30,6 @@ public class Parser {
     public static Programa parsear(List<Token> tokens) {
         return new Parser(tokens).programa();
     }
-
-    // ---------- Herramientas ----------
 
     private Token actual() {
         return tokens.get(pos);
@@ -67,7 +64,6 @@ public class Parser {
         return actual().tipo() == TipoToken.FIN;
     }
 
-    // Cómo se le muestra una palabra clave al usuario: su primera frase en Palabras.java.
     private static String frase(String nombre) {
         return "«" + Palabras.PALABRAS_CLAVE.get(nombre).get(0) + "»";
     }
@@ -92,7 +88,6 @@ public class Parser {
         avanzar();
     }
 
-    // Toda frase termina en "." "?" o "!". El error se marca justo donde terminó la frase anterior.
     private void finDeFrase() {
         if (!es(TipoToken.PUNTUACION, "FIN_FRASE")) {
             Token anterior = tokens.get(pos - 1);
@@ -102,9 +97,6 @@ public class Parser {
         avanzar();
     }
 
-    // ---------- Programa y sentencias ----------
-
-    // programa = INICIO fin { sentencia } FIN fin
     private Programa programa() {
         if (!esClave("INICIO")) {
             Token t = actual();
@@ -132,7 +124,6 @@ public class Parser {
         return new Programa(sentencias);
     }
 
-    // Lee sentencias hasta encontrar algo que cierre el bloque.
     private List<Sentencia> bloque() {
         List<Sentencia> sentencias = new ArrayList<>();
         while (!esClave("FIN_BLOQUE") && !esClave("SINO") && !esClave("FIN") && !esFinArchivo()) {
@@ -161,7 +152,6 @@ public class Parser {
                 + frase("MIENTRAS") + "...)");
     }
 
-    // asignacion = DECLARAR IDENTIFICADOR VALE expresion fin
     private Sentencia asignacion() {
         Token inicio = avanzar();
         String nombre = identificador();
@@ -171,7 +161,6 @@ public class Parser {
         return new Asignacion(nombre, valor, inicio.linea());
     }
 
-    // imprimir = IMPRIMIR expresion fin
     private Sentencia imprimir() {
         Token inicio = avanzar();
         Expresion valor = expresion();
@@ -179,7 +168,6 @@ public class Parser {
         return new Imprimir(valor, inicio.linea());
     }
 
-    // leer = LEER IDENTIFICADOR fin
     private Sentencia leer() {
         Token inicio = avanzar();
         String nombre = identificador();
@@ -187,7 +175,6 @@ public class Parser {
         return new Leer(nombre, inicio.linea());
     }
 
-    // si = SI expresion [ENTONCES] ":" { sentencia } [ SINO ":" { sentencia } ] FIN_BLOQUE fin
     private Sentencia si() {
         Token inicio = avanzar();
         Expresion condicion = expresion();
@@ -203,7 +190,6 @@ public class Parser {
         return new Si(condicion, entonces, sino, inicio.linea());
     }
 
-    // mientras = MIENTRAS expresion [ENTONCES] ":" { sentencia } FIN_BLOQUE fin
     private Sentencia mientras() {
         Token inicio = avanzar();
         Expresion condicion = expresion();
@@ -235,13 +221,10 @@ public class Parser {
         return avanzar().lexema();
     }
 
-    // ---------- Expresiones (de menor a mayor precedencia) ----------
-
     private Expresion expresion() {
         return o();
     }
 
-    // o = y { "o" y }
     private Expresion o() {
         Expresion izq = y();
         while (esOperador("o")) {
@@ -251,7 +234,6 @@ public class Parser {
         return izq;
     }
 
-    // y = negacion { "y" negacion }
     private Expresion y() {
         Expresion izq = negacion();
         while (esOperador("y")) {
@@ -261,7 +243,6 @@ public class Parser {
         return izq;
     }
 
-    // negacion = "no" negacion | comparacion
     private Expresion negacion() {
         if (esOperador("no")) {
             Token op = avanzar();
@@ -270,7 +251,6 @@ public class Parser {
         return comparacion();
     }
 
-    // comparacion = suma [ ("==" | "!=" | "<" | ">" | "<=" | ">=") suma ]
     private Expresion comparacion() {
         Expresion izq = suma();
         if (esOperador("==", "!=", "<", ">", "<=", ">=")) {
@@ -280,7 +260,6 @@ public class Parser {
         return izq;
     }
 
-    // suma = producto { ("+" | "-") producto }
     private Expresion suma() {
         Expresion izq = producto();
         while (esOperador("+", "-")) {
@@ -290,7 +269,6 @@ public class Parser {
         return izq;
     }
 
-    // producto = unario { ("*" | "/" | "%") unario }
     private Expresion producto() {
         Expresion izq = unario();
         while (esOperador("*", "/", "%")) {
@@ -300,7 +278,6 @@ public class Parser {
         return izq;
     }
 
-    // unario = "-" unario | primario
     private Expresion unario() {
         if (esOperador("-")) {
             Token op = avanzar();
@@ -309,7 +286,6 @@ public class Parser {
         return primario();
     }
 
-    // primario = NUMERO | TEXTO | BOOLEANO | IDENTIFICADOR | "(" expresion ")"
     private Expresion primario() {
         Token t = actual();
         switch (t.tipo()) {

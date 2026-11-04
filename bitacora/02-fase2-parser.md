@@ -11,19 +11,33 @@
 
 ## 2. Qué hace el parser
 
-El lexer entrega una lista plana de tokens. El parser revisa que estén en un orden válido y construye un árbol que muestra qué va dentro de qué:
+El lexer entrega una lista plana de tokens. El parser revisa que estén en un orden válido y construye un árbol que muestra qué va dentro de qué.
+
+Código:
 
 ```
-Si plata mayor que 15000 hágale:          SI plata > 15000 ENTONCES : IMPRIMIR "Alcanza" . FIN_BLOQUE .
-    Diga "Alcanza".                 →
-Listo.                                    Si
-                                          ├── condición
-                                          │   └── Operación: >
-                                          │       ├── Variable: plata
-                                          │       └── Número: 15000
-                                          └── entonces
-                                              └── Imprimir
-                                                  └── Texto: "Alcanza"
+Si plata mayor que 15000 hágale:
+    Diga "Alcanza".
+Listo.
+```
+
+Lo que entrega el lexer (una lista plana):
+
+```
+SI  plata  >  15000  ENTONCES  :  IMPRIMIR  "Alcanza"  .  FIN_BLOQUE  .
+```
+
+Lo que construye el parser (un árbol):
+
+```
+Si
+├── condición
+│   └── Operación: >
+│       ├── Variable: plata
+│       └── Número: 15000
+└── entonces
+    └── Imprimir
+        └── Texto: "Alcanza"
 ```
 
 ## 3. La gramática
