@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-// Vocabulario de Cubun: para agregar una frase basta con añadirla a su lista (tildes y mayúsculas da igual).
 public final class Palabras {
 
     private Palabras() {
@@ -50,12 +49,10 @@ public final class Palabras {
         BOOLEANOS.put(false, List.of("ni por el putas", "nokas"));
     }
 
-    // Vocativos y relleno: el lexer los reconoce y los descarta.
     public static final List<String> MULETILLAS = List.of(
             "parce", "parcero", "sumercé", "veci", "mijo", "mija", "pues",
             "oiga", "ve", "vea", "bueno", "hermano", "llave", "socio", "chino", "china");
 
-    // Los de dos caracteres van primero para que "==" no se lea como "=" "=".
     public static final List<String> OPERADORES_SIMBOLOS = List.of(
             "==", "!=", "<=", ">=", "+", "-", "*", "/", "%", "<", ">", "=");
 

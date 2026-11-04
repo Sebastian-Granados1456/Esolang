@@ -1,21 +1,10 @@
 package cubun.lexer;
 
-public class ErrorLexico extends RuntimeException {
+import cubun.ErrorCubun;
 
-    private final int linea;
-    private final int columna;
+public class ErrorLexico extends ErrorCubun {
 
     public ErrorLexico(String mensaje, int linea, int columna) {
-        super("¡Qué boleta! Línea " + linea + ", columna " + columna + ": " + mensaje);
-        this.linea = linea;
-        this.columna = columna;
-    }
-
-    public int getLinea() {
-        return linea;
-    }
-
-    public int getColumna() {
-        return columna;
+        super(mensaje, linea, columna);
     }
 }

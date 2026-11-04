@@ -1,6 +1,6 @@
 # Especificación del lenguaje Cubun
 
-Este documento crece con cada fase. Por ahora define el **nivel léxico** (fase 1). La gramática se agrega en la fase 2.
+Este documento crece con cada fase. Define el **nivel léxico** (fase 1, secciones 2–5) y la **gramática** (fase 2, secciones 6–8).
 
 ## 1. Generalidades
 
@@ -79,7 +79,7 @@ La lista completa vive en `src/main/java/cubun/lexer/Palabras.java`. Para agrega
 | `VALE` | vale |
 | `IMPRIMIR` | suelte el chisme, cuente, diga |
 | `LEER` | cuénteme, pregunte |
-| `SI` | si, si es que |
+| `SI` | si, si es que, por si las moscas |
 | `SINO` | si no, o si no, de lo contrario |
 | `ENTONCES` | entonces, hágale |
 | `MIENTRAS` | mientras, dele mientras, dele que dele mientras |
@@ -115,3 +115,92 @@ Todos empiezan con `¡Qué boleta! Línea L, columna C:`.
 | Carácter que no pertenece al lenguaje | `¿Y eso qué es? No le entiendo el '@'.` |
 | Texto sin cerrar | `Dejó el chisme a medias: le faltó cerrar las comillas.` |
 | Número pegado a letras | `'12lucas' no es ni plata ni nombre.` |
+
+## 6. Gramática (EBNF)
+
+La gramática trabaja sobre los tokens, no sobre el texto. Por eso cualquier frase del vocabulario sirve: `DECLARAR` es *ponga que* y `IMPRIMIR` es *suelte el chisme*, *cuente* o *diga*.
+
+```ebnf
+programa     = INICIO fin { sentencia } FIN fin ;
+fin          = FIN_FRASE ;                                  (* "." "?" o "!" *)
+
+sentencia    = asignacion | imprimir | leer | si | mientras ;
+asignacion   = DECLARAR IDENTIFICADOR VALE expresion fin ;
+imprimir     = IMPRIMIR expresion fin ;
+leer         = LEER IDENTIFICADOR fin ;
+si           = SI expresion [ ENTONCES ] ":" { sentencia }
+               [ SINO ":" { sentencia } ]
+               FIN_BLOQUE fin ;
+mientras     = MIENTRAS expresion [ ENTONCES ] ":" { sentencia } FIN_BLOQUE fin ;
+
+expresion    = o ;
+o            = y { "o" y } ;
+y            = negacion { "y" negacion } ;
+negacion     = "no" negacion | comparacion ;
+comparacion  = suma [ ( "==" | "!=" | "<" | ">" | "<=" | ">=" ) suma ] ;
+suma         = producto { ( "+" | "-" ) producto } ;
+producto     = unario { ( "*" | "/" | "%" ) unario } ;
+unario       = "-" unario | primario ;
+primario     = NUMERO | TEXTO | BOOLEANO | IDENTIFICADOR | "(" expresion ")" ;
+```
+
+Reglas que se desprenden de la gramática:
+
+- **Toda frase termina en punto** (o en `?` o `!`), incluidos el saludo, la despedida y el cierre de los bloques.
+- **Los bloques se abren con `:`** (con `hágale` o `entonces` opcional antes) y **se cierran con `listo`**.
+- **Precedencia**, de menor a mayor: `o`, `y`, `no`, comparaciones, `+ -`, `* / %` y el `-` de un número negativo. `12000 + 500 * 2` es `12000 + (500 * 2)`. Los paréntesis cambian el orden.
+- **Las comparaciones no se encadenan:** `a < b < c` no es válido; se escribe `a < b y b < c`.
+- **`Ponga que` sirve para crear una variable y también para cambiarle el valor.**
+- **No hay `si no, si` (else if):** se anida un `si` dentro del `si no`.
+- **Las funciones (`camello`, `pídale a`, `devuelva`) todavía no hacen parte de la gramática.** Se agregan en la fase 4.
+
+## 7. Árbol de sintaxis (AST)
+
+El parser convierte los tokens en un árbol con estos nodos:
+
+| Nodo | Representa | Hijos |
+|---|---|---|
+| `Programa` | El programa completo | lista de sentencias |
+| `Asignacion` | `Ponga que x vale …` | nombre, expresión |
+| `Imprimir` | `Diga …` | expresión |
+| `Leer` | `Cuénteme x` | nombre |
+| `Si` | `Si … : … o si no: … listo` | condición, sentencias del *entonces*, sentencias del *si no* |
+| `Mientras` | `Mientras … : … listo` | condición, sentencias del cuerpo |
+| `Numero`, `Texto`, `Booleano` | Valores literales | — |
+| `Variable` | Un nombre usado como valor | nombre |
+| `Binaria` | `a + b`, `a > b`, `a y b`… | operador, izquierda, derecha |
+| `Unaria` | `-a`, `no a` | operador, operando |
+
+Ejemplo:
+
+```
+Si plata mayor que 15000 hágale:
+    Diga "Alcanza".
+Listo.
+```
+
+```
+Si
+├── condición
+│   └── Operación: >
+│       ├── Variable: plata
+│       └── Número: 15000
+└── entonces
+    └── Imprimir
+        └── Texto: "Alcanza"
+```
+
+## 8. Errores de sintaxis
+
+| Situación | Mensaje |
+|---|---|
+| No empieza con el saludo | `¡Qué maleducado! El programa tiene que empezar saludando («quiubo»).` |
+| No termina con la despedida | `Se esperaba «chao» (¿se va a ir sin despedirse?) pero llegó el final del archivo.` |
+| Falta el punto | `Le faltó el punto («.») al final de la frase.` |
+| Un bloque sin cerrar | `Se esperaba «listo» para cerrar el «Si» de la línea 2 pero llegó «Chao».` |
+| Un `listo` o `si no` que no cierra nada | `«Listo» no cierra nada: no hay ningún «si» ni «mientras» abierto.` |
+| Falta una pieza de la frase | `Se esperaba «vale» pero llegó «1».` |
+| Falta un valor | `Se esperaba un valor (número, texto, nombre...) pero llegó «.».` |
+| Algo después de la despedida | `Se esperaba el final del archivo después de la despedida pero llegó «Diga».` |
+
+Todos llevan línea y columna, igual que los errores léxicos.

@@ -16,16 +16,25 @@ Esolang/
 │   └── 02-especificacion.md            # definición del lenguaje (crece con cada fase)
 ├── pom.xml                             # proyecto Maven (Java 21)
 ├── src/main/java/cubun/
-│   ├── Main.java                       # imprime la tabla de tokens de un .cbn
-│   └── lexer/
-│       ├── Palabras.java               # vocabulario: aquí se agregan frases nuevas
-│       ├── TipoToken.java              # tipos de token
-│       ├── Token.java
-│       ├── ErrorLexico.java
-│       └── Lexer.java                  # analizador léxico
+│   ├── Main.java                       # muestra el AST (o los tokens con --tokens)
+│   ├── ErrorCubun.java                 # base de los errores, con línea y columna
+│   ├── lexer/
+│   │   ├── Palabras.java               # vocabulario: aquí se agregan frases nuevas
+│   │   ├── TipoToken.java              # tipos de token
+│   │   ├── Token.java
+│   │   ├── ErrorLexico.java
+│   │   └── Lexer.java                  # analizador léxico
+│   └── parser/
+│       ├── Sentencia.java              # nodos del AST: instrucciones
+│       ├── Expresion.java              # nodos del AST: valores y operaciones
+│       ├── Programa.java               # raíz del AST
+│       ├── Parser.java                 # analizador sintáctico
+│       ├── ErrorSintaxis.java
+│       └── ImpresorAst.java            # dibuja el árbol
 ├── ejemplos/                           # programas .cbn
 └── bitacora/
     ├── 01-fase1-lexer.md               # introducción + fase 1
+    ├── 02-fase2-parser.md
     └── evidencias/                     # pantallazos
 ```
 
@@ -34,7 +43,7 @@ Esolang/
 | Fase | Contenido | Estado |
 |------|-----------|--------|
 | 1 | Lexer: reconoce los tokens carácter por carácter, con errores por línea y columna | ✅ Hecha |
-| 2 | Parser con AST y gramática formal | Pendiente |
+| 2 | Parser con AST y gramática formal | ✅ Hecha |
 | 3 | Intérprete que recorre el AST (bloques anidados) | Pendiente |
 | 4 | Funciones definidas por el usuario (*camellos*) y ámbitos | Pendiente |
 | 5 | Manejo de errores propio del lenguaje | Pendiente |

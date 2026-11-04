@@ -1,0 +1,22 @@
+¿Quiubo, parce?
+# ¿Para cuántos almuerzos alcanza la plata de la semana?
+
+Ponga que plata vale 50000.
+Ponga que almuerzo vale 12000 + 500 * 2.
+Ponga que dias vale 0.
+
+Dele mientras plata mayor o igual que almuerzo:
+    Ponga que plata vale plata menos almuerzo.
+    Ponga que dias vale dias más 1.
+Ya estuvo.
+
+Diga "Alcanza para estos días:".
+Diga dias.
+
+Si dias menor que 5 y no (plata igual a 0) hágale:
+    Diga "Toca hacer una vaca".
+O si no:
+    Diga "Sobrevivimos la semana".
+Listo el pollo.
+
+Chao pues.
