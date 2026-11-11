@@ -1,0 +1,19 @@
+¿Quiubo, parce?
+
+Sumercé, diga "¿Cómo es su nombre?".
+Cuénteme nombre.
+Diga "¿Y cuántos años tiene?".
+Por favor, cuénteme edad.
+
+Diga "Quiubo, " más nombre más ".".
+
+Si edad mayor o igual que 18 hágale:
+    Diga "Ya puede sacar la cédula.".
+O si no:
+    Diga "Le faltan " más (18 menos edad) más " años pa' la cédula.".
+Listo.
+
+Ponga que pasaje vale 3200.
+Diga "Diez pasajes de Transmi le salen en " más el man por 10 más " pesos.".
+
+Chao pues, sumercé.

@@ -8,5 +8,6 @@ public enum TipoToken {
     BOOLEANO,
     OPERADOR,
     PUNTUACION,
+    MULETILLA,
     FIN
 }

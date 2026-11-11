@@ -14,6 +14,9 @@ public sealed interface Expresion {
     record Variable(String nombre, int linea) implements Expresion {
     }
 
+    record ElMan(int linea) implements Expresion {
+    }
+
     record Binaria(String operador, Expresion izquierda, Expresion derecha, int linea) implements Expresion {
     }
 

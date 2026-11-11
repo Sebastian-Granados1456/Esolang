@@ -11,6 +11,12 @@ public class ErrorCubun extends RuntimeException {
         this.columna = columna;
     }
 
+    public ErrorCubun(String mensaje, int linea) {
+        super("¡Qué boleta! Línea " + linea + ": " + mensaje);
+        this.linea = linea;
+        this.columna = 0;
+    }
+
     public int getLinea() {
         return linea;
     }

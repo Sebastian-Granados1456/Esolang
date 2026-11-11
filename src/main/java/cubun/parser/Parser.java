@@ -1,13 +1,17 @@
 package cubun.parser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import cubun.lexer.Lexer;
 import cubun.lexer.Palabras;
 import cubun.lexer.TipoToken;
 import cubun.lexer.Token;
 import cubun.parser.Expresion.Binaria;
 import cubun.parser.Expresion.Booleano;
+import cubun.parser.Expresion.ElMan;
 import cubun.parser.Expresion.Numero;
 import cubun.parser.Expresion.Texto;
 import cubun.parser.Expresion.Unaria;
@@ -20,11 +24,25 @@ import cubun.parser.Sentencia.Si;
 
 public class Parser {
 
-    private final List<Token> tokens;
+    private final List<Token> tokens = new ArrayList<>();
+    private final Set<Integer> frasesCorteses = new HashSet<>();
+    private int frases = 0;
     private int pos = 0;
 
-    public Parser(List<Token> tokens) {
-        this.tokens = tokens;
+    public Parser(List<Token> entrada) {
+        List<String> cortesia = Palabras.CORTESIA.stream().map(Lexer::normalizar).toList();
+        for (Token t : entrada) {
+            if (t.tipo() == TipoToken.MULETILLA) {
+                if (cortesia.contains(t.valor())) {
+                    frasesCorteses.add(frases);
+                }
+                continue;
+            }
+            tokens.add(t);
+            if (t.tipo() == TipoToken.PUNTUACION && t.valor().equals("FIN_FRASE")) {
+                frases++;
+            }
+        }
     }
 
     public static Programa parsear(List<Token> tokens) {
@@ -116,12 +134,31 @@ public class Parser {
             throw new ErrorSintaxis("«" + t.lexema() + "» no cierra nada: no hay ningún " + frase("SI") + " ni "
                     + frase("MIENTRAS") + " abierto.", t.linea(), t.columna());
         }
-        avanzar();
+        Token despedida = avanzar();
         finDeFrase();
         if (!esFinArchivo()) {
             throw error("el final del archivo después de la despedida");
         }
+        revisarCortesia(despedida);
         return new Programa(sentencias);
+    }
+
+    // Como el PLEASE de INTERCAL: entre 1 de cada 5 y 1 de cada 2 frases deben pedir el favor.
+    private void revisarCortesia(Token despedida) {
+        int corteses = frasesCorteses.size();
+        int minimo = (frases + 4) / 5;
+        int maximo = frases / 2;
+        if (corteses < minimo) {
+            String cuantas = corteses == 0 ? "ninguna pide" : "solo " + corteses + (corteses == 1 ? " pide" : " piden");
+            throw new ErrorSintaxis("¡Qué confianzudo! De " + frases + " frases, " + cuantas
+                    + " el favor. Use «sumercé» o «por favor» en al menos " + minimo + ".",
+                    despedida.linea(), despedida.columna());
+        }
+        if (corteses > maximo) {
+            throw new ErrorSintaxis("¡Qué lambón! " + corteses + " de " + frases
+                    + " frases piden el favor. Tanta cortesía da desconfianza (máximo " + maximo + ").",
+                    despedida.linea(), despedida.columna());
+        }
     }
 
     private List<Sentencia> bloque() {
@@ -306,6 +343,10 @@ public class Parser {
                 return new Variable(t.lexema(), t.linea());
             }
             default -> {
+                if (esClave("EL_MAN")) {
+                    avanzar();
+                    return new ElMan(t.linea());
+                }
                 if (es(TipoToken.PUNTUACION, "PAREN_ABRE")) {
                     avanzar();
                     Expresion dentro = expresion();

@@ -29,6 +29,7 @@ public final class Palabras {
         PALABRAS_CLAVE.put("CON", List.of("con"));
         PALABRAS_CLAVE.put("RETORNAR", List.of("devuelva", "ahí le va"));
         PALABRAS_CLAVE.put("LLAMAR", List.of("pídale a", "pídale el favor a"));
+        PALABRAS_CLAVE.put("EL_MAN", List.of("el man", "la man", "ese man", "esa man"));
 
         OPERADORES_VERBALES.put("+", List.of("más"));
         OPERADORES_VERBALES.put("-", List.of("menos"));
@@ -50,8 +51,10 @@ public final class Palabras {
     }
 
     public static final List<String> MULETILLAS = List.of(
-            "parce", "parcero", "sumercé", "veci", "mijo", "mija", "pues",
+            "parce", "parcero", "sumercé", "su merced", "por favor", "veci", "mijo", "mija", "pues",
             "oiga", "ve", "vea", "bueno", "hermano", "llave", "socio", "chino", "china");
+
+    public static final List<String> CORTESIA = List.of("sumercé", "su merced", "por favor");
 
     public static final List<String> OPERADORES_SIMBOLOS = List.of(
             "==", "!=", "<=", ">=", "+", "-", "*", "/", "%", "<", ">", "=");

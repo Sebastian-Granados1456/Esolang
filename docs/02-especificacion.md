@@ -1,6 +1,6 @@
 # Especificación del lenguaje Cubun
 
-Este documento crece con cada fase. Define el **nivel léxico** (fase 1, secciones 2–5) y la **gramática** (fase 2, secciones 6–8).
+Este documento crece con cada fase. Define el **nivel léxico** (fase 1, secciones 2–5), la **gramática** (fase 2, secciones 6–8) y la **ejecución** (fase 3, secciones 9–10).
 
 ## 1. Generalidades
 
@@ -51,9 +51,9 @@ Van entre comillas dobles `"…"` y no pueden ocupar varias líneas. No hay secu
 
 ### 3.5 Muletillas
 
-`parce`, `parcero`, `sumercé`, `veci`, `mijo`, `mija`, `pues`, `oiga`, `ve`, `vea`, `bueno`, `hermano`, `llave`, `socio`, `chino`, `china`.
+`parce`, `parcero`, `sumercé`, `su merced`, `por favor`, `veci`, `mijo`, `mija`, `pues`, `oiga`, `ve`, `vea`, `bueno`, `hermano`, `llave`, `socio`, `chino`, `china`.
 
-El lexer las reconoce y las **descarta**, junto con las comas del vocativo: `¿Quiubo, parce?` produce solo `INICIO` y `FIN_FRASE`.
+El lexer las entrega como tokens `MULETILLA` y se lleva las comas del vocativo: `¿Quiubo, parce?` produce `INICIO`, `MULETILLA parce` y `FIN_FRASE`. Pueden ir en cualquier parte de una frase. No cambian lo que hace la instrucción, pero las de **cortesía** (`sumercé`, `su merced`, `por favor`) cuentan para la regla de la sección 6.1.
 
 ### 3.6 Puntuación
 
@@ -88,6 +88,7 @@ La lista completa vive en `src/main/java/cubun/lexer/Palabras.java`. Para agrega
 | `CON` | con |
 | `RETORNAR` | devuelva, ahí le va |
 | `LLAMAR` | pídale a, pídale el favor a |
+| `EL_MAN` | el man, la man, ese man, esa man |
 
 ### 4.2 Operadores
 
@@ -141,7 +142,7 @@ comparacion  = suma [ ( "==" | "!=" | "<" | ">" | "<=" | ">=" ) suma ] ;
 suma         = producto { ( "+" | "-" ) producto } ;
 producto     = unario { ( "*" | "/" | "%" ) unario } ;
 unario       = "-" unario | primario ;
-primario     = NUMERO | TEXTO | BOOLEANO | IDENTIFICADOR | "(" expresion ")" ;
+primario     = NUMERO | TEXTO | BOOLEANO | IDENTIFICADOR | EL_MAN | "(" expresion ")" ;
 ```
 
 Reglas que se desprenden de la gramática:
@@ -153,6 +154,16 @@ Reglas que se desprenden de la gramática:
 - **`Ponga que` sirve para crear una variable y también para cambiarle el valor.**
 - **No hay `si no, si` (else if):** se anida un `si` dentro del `si no`.
 - **Las funciones (`camello`, `pídale a`, `devuelva`) todavía no hacen parte de la gramática.** Se agregan en la fase 4.
+- **Las muletillas no aparecen en la gramática:** el parser las aparta antes de empezar y solo las usa para la regla de cortesía.
+
+### 6.1 Regla de cortesía
+
+Como el *PLEASE* de INTERCAL, el primer esolang: un programa tiene que pedir las cosas con educación, pero sin exagerar. Se cuentan las frases (todo lo que termina en punto, incluidos el saludo, la despedida y los `listo`) y cuántas de ellas llevan una muletilla de cortesía:
+
+- **Mínimo:** 1 de cada 5 frases (redondeando hacia arriba). Si no se cumple: *¡Qué confianzudo!*
+- **Máximo:** la mitad de las frases. Si se pasa: *¡Qué lambón!*
+
+Por ejemplo, un programa de 13 frases necesita entre 3 y 6 frases corteses.
 
 ## 7. Árbol de sintaxis (AST)
 
@@ -202,5 +213,67 @@ Si
 | Falta una pieza de la frase | `Se esperaba «vale» pero llegó «1».` |
 | Falta un valor | `Se esperaba un valor (número, texto, nombre...) pero llegó «.».` |
 | Algo después de la despedida | `Se esperaba el final del archivo después de la despedida pero llegó «Diga».` |
+| Muy poca cortesía | `¡Qué confianzudo! De 13 frases, ninguna pide el favor. Use «sumercé» o «por favor» en al menos 3.` |
+| Demasiada cortesía | `¡Qué lambón! 4 de 4 frases piden el favor. Tanta cortesía da desconfianza (máximo 2).` |
 
 Todos llevan línea y columna, igual que los errores léxicos.
+
+## 9. Ejecución
+
+El intérprete recorre el árbol de arriba hacia abajo y ejecuta cada sentencia en orden.
+
+### 9.1 Valores
+
+| Tipo | Ejemplos | Cómo se imprime |
+|---|---|---|
+| Número | `20000`, `3.5` | Sin `.0` si es entero: `6 / 2` → `3` |
+| Texto | `"hola"` | Sin comillas: `hola` |
+| Booleano | `de una`, `nokas` | `de una` o `nokas` |
+
+### 9.2 Sentencias
+
+| Sentencia | Qué hace |
+|---|---|
+| `Ponga que x vale …` | Calcula el valor y lo guarda con el nombre `x`. Si `x` ya existía, lo reemplaza |
+| `Diga …` | Calcula el valor y lo imprime en una línea nueva |
+| `Cuénteme x` | Lee una línea del teclado. Si es un número, la guarda como número; si no, como texto. Sin entrada, guarda un texto vacío |
+| `Si …:` | Si la condición da `de una`, ejecuta el bloque; si da `nokas`, ejecuta el `si no` (si lo hay) |
+| `Mientras …:` | Repite el bloque mientras la condición dé `de una` |
+
+Por ahora todas las variables son globales: hay una sola memoria para todo el programa. Los ámbitos llegan con las funciones en la fase 4.
+
+**`el man`** es el último valor del que se habló: el que calculó la última `Ponga que`, `Diga` o `Cuénteme`. Como en *«¿y el man qué dijo?»*, el contexto dice quién es:
+
+```
+Ponga que pasaje vale 3200.
+Diga el man por 10.          → 32000
+```
+
+### 9.3 Operaciones
+
+| Operación | Funciona con | Resultado |
+|---|---|---|
+| `+` (`más`) | dos números, o un texto y cualquier cosa | Suma, o junta los textos: `"Total: " más 3` → `Total: 3` |
+| `-` `*` `%` | números | Entero si los dos son enteros |
+| `/` (`entre`) | números | Puede dar decimal: `7 / 2` → `3.5` |
+| `==` `!=` | cualquier valor | `3 == 3.0` es `de una` |
+| `<` `>` `<=` `>=` | dos números o dos textos | Los textos se comparan en orden alfabético |
+| `y` `o` | booleanos | `y` no evalúa la derecha si la izquierda es `nokas`; `o` no la evalúa si es `de una` |
+| `no` | un booleano | Lo contrario |
+| `-` delante de un valor | un número | El número negativo |
+
+Las condiciones del `si` y del `mientras` tienen que dar un booleano: `Si 5:` es un error.
+
+## 10. Errores de ejecución
+
+Solo aparecen al correr el programa, y llevan la línea:
+
+| Situación | Mensaje |
+|---|---|
+| Variable que no existe | `¿Y quién es «plata»? Nadie la ha puesto.` |
+| División entre cero | `¡Nadie puso pa' la vaca! No se puede dividir entre cero.` |
+| Operación con tipos que no van | `No se puede hacer «-» entre un texto ("hola") y un número (1).` |
+| Comparación con tipos distintos | `No se puede comparar un texto ("5") con un número (3).` |
+| Condición que no es booleana | `La condición del «si» tiene que dar de una o nokas, pero dio un número (5).` |
+| `y` / `o` / `no` con algo que no es booleano | `«y» solo funciona con de una o nokas, pero llegó un número (1).` |
+| `el man` antes de calcular algo | `¿Cuál man? Todavía no se ha hablado de nada.` |

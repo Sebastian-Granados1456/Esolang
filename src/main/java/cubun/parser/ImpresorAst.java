@@ -5,6 +5,7 @@ import java.util.List;
 
 import cubun.parser.Expresion.Binaria;
 import cubun.parser.Expresion.Booleano;
+import cubun.parser.Expresion.ElMan;
 import cubun.parser.Expresion.Numero;
 import cubun.parser.Expresion.Texto;
 import cubun.parser.Expresion.Unaria;
@@ -66,6 +67,7 @@ public final class ImpresorAst {
             case Texto t -> new Rama("Texto: \"" + t.valor() + "\"");
             case Booleano b -> new Rama("Booleano: " + (b.valor() ? "de una" : "nokas"));
             case Variable v -> new Rama("Variable: " + v.nombre());
+            case ElMan m -> new Rama("El man (último valor)");
             case Binaria b -> new Rama("Operación: " + b.operador(), rama(b.izquierda()), rama(b.derecha()));
             case Unaria u -> new Rama("Operación: " + u.operador(), rama(u.operando()));
         };

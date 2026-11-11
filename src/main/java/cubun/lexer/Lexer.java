@@ -189,7 +189,7 @@ public class Lexer {
             if (n <= palabras.size() && f.palabras().equals(palabras.subList(0, n))) {
                 saltarHasta(finales.get(n - 1));
                 if (f.tipo() == null) {
-                    descartarMuletilla();
+                    agregarMuletilla(String.join(" ", f.palabras()), inicio, l, col);
                 } else {
                     agregar(f.tipo(), f.valor(), inicio, l, col);
                 }
@@ -206,10 +206,11 @@ public class Lexer {
     }
 
     // Las comas del vocativo ("Quiubo, parce, ...") se van con la muletilla.
-    private void descartarMuletilla() {
+    private void agregarMuletilla(String muletilla, int inicio, int l, int col) {
         if (!tokens.isEmpty() && "COMA".equals(tokens.get(tokens.size() - 1).valor())) {
             tokens.remove(tokens.size() - 1);
         }
+        agregar(TipoToken.MULETILLA, muletilla, inicio, l, col);
         while (actual() == ' ' || actual() == '\t') {
             avanzar();
         }
